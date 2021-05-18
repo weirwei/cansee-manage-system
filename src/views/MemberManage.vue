@@ -107,17 +107,18 @@
 </template>
 
 <script>
-import {fetchData} from "../api/index";
+import { getOrgMemberReq } from "@/api/member";
 
 export default {
   name: "memberManage",
   data() {
     return {
       query: {
-        address: "",
-        name: "",
-        pageIndex: 1,
-        pageSize: 10
+        // address: "",
+        // name: "",
+        // pageIndex: 1,
+        // pageSize: 10
+
       },
       tableData: [],
       delList: [],
@@ -135,7 +136,12 @@ export default {
   methods: {
     // 获取 easy-mock 的模拟数据
     getData() {
-      fetchData(this.query).then(res => {
+      console.log(this.$route.params)
+      console.log(localStorage.getItem("ms_uid"))
+      let query = {
+        orgId: this.$route.params.orgId,
+      }
+      getOrgMemberReq(query).then(res => {
         console.log(res);
         this.tableData = res.list;
         this.pageTotal = res.pageTotal || 50;

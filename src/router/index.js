@@ -69,11 +69,19 @@ const routes = [
                 name: "permission",
                 meta: {
                     title: '权限管理',
-                    permission: true
+                    // permission: true
                 },
                 component: () => import (
                 /* webpackChunkName: "permission" */
                 "../views/Organization.vue")
+            }, {
+                path: "/:orgId/member",
+                name: "member",
+                meta: {
+                    title: '成员管理管理',
+                },
+                component: () => import (
+                "../views/MemberManage.vue")
             }, {
                 path: "/i18n",
                 name: "i18n",

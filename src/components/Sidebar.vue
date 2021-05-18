@@ -139,6 +139,10 @@ export default {
                             title: "权限测试"
                         },
                         {
+                            index: "member",
+                            title: "成员管理"
+                        },
+                        {
                             index: "404",
                             title: "404页面"
                         }

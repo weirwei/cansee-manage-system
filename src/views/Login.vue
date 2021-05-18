@@ -33,6 +33,7 @@
 
 <script>
 import { login } from "@/api/login";
+import axios from "axios";
 
 export default {
   data() {
@@ -54,7 +55,7 @@ export default {
             trigger: "blur"
           }
         ],
-        password: [
+        passwd: [
           {required: true, message: "请输入密码", trigger: "blur"}
         ]
       }
@@ -76,8 +77,10 @@ export default {
               return false;
             } else if (res.status === 'success') {
               this.$message.success("登录成功");
-              localStorage.setItem("ms_username", this.param.telephone);
-              localStorage.setItem("authorization", res.data)
+              localStorage.setItem("ms_username", res.data.nick);
+              localStorage.setItem("ms_uid", res.data.uid);
+              localStorage.setItem("authorization", res.data.token)
+              axios.defaults.headers.common['authorization'] = localStorage.getItem('authorization');
               this.$router.push("/");
               return true;
             }

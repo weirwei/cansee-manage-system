@@ -18,9 +18,19 @@ const createOrgReq = param => {
         data: qs.stringify(param)
     })
 }
+
+const delOrgReq = param => {
+    return request({
+        url: server + '/org',
+        method: 'delete',
+        data: qs.stringify(param)
+    })
+}
+
 export {
     getOrgReq,
     createOrgReq,
+    delOrgReq,
 }
 
 

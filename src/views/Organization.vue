@@ -28,8 +28,9 @@
         <el-table-column label="操作" width="180" align="center">
           <template #default="scope">
             <el-button
+                :disabled="scope.row.role.code !== 10001"
                 type="text"
-                icon="el-icon-lx-people"
+                icon="el-icon-lx-delete"
                 class="red"
                 @click="handleDelete(scope.$index, scope.row)"
             >注销</el-button>
@@ -50,9 +51,9 @@
 
     <!-- 创建组织弹出框 -->
     <el-dialog title="创建组织" v-model="visible" width="30%">
-      <el-form ref="form" :model="createOrgParam" label-width="70px">
+      <el-form ref="form" :model="orgName" label-width="70px">
         <el-form-item label="组织名">
-          <el-input v-model="createOrgParam.orgName"></el-input>
+          <el-input v-model="orgName"></el-input>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -66,7 +67,7 @@
 </template>
 
 <script>
-import {createOrgReq, getOrgReq} from "@/api/organization";
+import {createOrgReq, delOrgReq, getOrgReq} from "@/api/organization";
 
 export default {
   name: "orgnization",
@@ -78,10 +79,7 @@ export default {
         page: 1,
         size: 10
       },
-      createOrgParam: {
-        uid: "",
-        orgName: ""
-      },
+      orgName: "",
       uid: "",
       tableData: [],
       orgVOList: [],
@@ -119,43 +117,52 @@ export default {
       this.getData();
     },
     // 删除操作
-    handleDelete(index) {
+    handleDelete(index, row) {
+      console.log(index + ":" + row)
       // 二次确认删除
       this.$confirm("确定要删除吗？", "提示", {
         type: "warning"
       })
           .then(() => {
-            this.$message.success("删除成功");
-            this.tableData.splice(index, 1);
+            if (row.role.orgId !== 100012) {
+              this.$message.error("权限不足");
+              return false;
+            }
+            let param = {
+              orgId: row.orgId,
+            }
+            delOrgReq(param).then(res => {
+              if (res.status === "success") {
+                this.$message.success("删除成功");
+                this.orgVOList.splice(index, 1);
+                return true;
+              } else if (res.status === "fail") {
+                this.$message.error(res.data.errorMsg);
+                return false;
+              }
+            })
           })
-          .catch(() => {});
     },
     // 多选操作
     handleSelectionChange(val) {
       this.multipleSelection = val;
     },
-    delAllSelection() {
-      const length = this.multipleSelection.length;
-      let str = "";
-      this.delList = this.delList.concat(this.multipleSelection);
-      for (let i = 0; i < length; i++) {
-        str += this.multipleSelection[i].name + " ";
-      }
-      this.$message.error(`删除了${str}`);
-      this.multipleSelection = [];
-    },
     handleCreateOrg() {
       this.visible = true;
     },
-    // 编辑操作
+    // 创建组织操作
     createOrg() {
-      this.createOrgParam.uid = this.uid
-      console.log(this.createOrgParam);
-      createOrgReq(this.createOrgParam).then(res => {
+      let param = {
+        uid: this.uid,
+        orgName: this.orgName,
+      }
+      console.log(param);
+      createOrgReq(param).then(res => {
         console.log(res);
         if (res.status === "success") {
           this.orgVOList.push(res.data)
           this.$message.success("创建成功");
+          this.visible = false
           return true;
         } else if (res.status === "fail") {
           this.$message.error(res.data.errorMsg);
