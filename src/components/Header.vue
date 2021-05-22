@@ -65,8 +65,10 @@ export default {
     methods: {
         // 用户名下拉菜单选择事件
         handleCommand(command) {
-            if (command == "loginout") {
+            if (command === "loginout") {
                 localStorage.removeItem("ms_username");
+                localStorage.removeItem("ms_uid");
+                localStorage.removeItem("authorization");
                 this.$router.push("/login");
             }
         },

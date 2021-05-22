@@ -7,7 +7,10 @@ const getOrgReq = query => {
     return request({
         url: server + "/org",
         method: 'get',
-        params: query
+        params: query,
+        headers: {
+            'authorization': localStorage.getItem('authorization')
+        },
     });
 }
 
@@ -15,7 +18,10 @@ const createOrgReq = param => {
     return request({
         url: server + '/org',
         method: 'post',
-        data: qs.stringify(param)
+        data: qs.stringify(param),
+        headers: {
+            'authorization': localStorage.getItem('authorization')
+        },
     })
 }
 
@@ -23,7 +29,10 @@ const delOrgReq = param => {
     return request({
         url: server + '/org',
         method: 'delete',
-        data: qs.stringify(param)
+        data: qs.stringify(param),
+        headers: {
+            'authorization': localStorage.getItem('authorization')
+        },
     })
 }
 

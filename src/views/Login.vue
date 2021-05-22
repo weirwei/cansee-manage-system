@@ -59,10 +59,10 @@ export default {
           {required: true, message: "请输入密码", trigger: "blur"}
         ]
       }
-    };
+    }
   },
   created() {
-    this.$store.commit("clearTags");
+    this.$store.commit("clearTags")
   },
   methods: {
     submitForm() {
@@ -72,27 +72,26 @@ export default {
           login(this.param).then((res) => {
             console.log(res)
             if (res.status === 'fail') {
-              this.$message.error(res.data.errorMsg);
-              this.$message.error("请输入正确的账号和密码");
-              return false;
+              this.$message.error(res.data.errorMsg)
+              this.$message.error("请输入正确的账号和密码")
+              return false
             } else if (res.status === 'success') {
-              this.$message.success("登录成功");
-              localStorage.setItem("ms_username", res.data.nick);
-              localStorage.setItem("ms_uid", res.data.uid);
+              this.$message.success("登录成功")
+              localStorage.setItem("ms_username", res.data.nick)
+              localStorage.setItem("ms_uid", res.data.uid)
               localStorage.setItem("authorization", res.data.token)
-              axios.defaults.headers.common['authorization'] = localStorage.getItem('authorization');
-              this.$router.push("/");
-              return true;
+              this.$router.push("/")
+              return true
             }
           })
         } else {
-          this.$message.error("请输入账号和密码");
-          return false;
+          this.$message.error("请输入账号和密码")
+          return false
         }
-      });
+      })
     }
   }
-};
+}
 </script>
 
 <style scoped>
