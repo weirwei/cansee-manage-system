@@ -2,7 +2,6 @@
     <div class="sidebar">
         <el-menu
             class="sidebar-el-menu"
-            :default-active="onRoutes"
             :collapse="collapse"
             background-color="#324157"
             text-color="#bfcbd9"
@@ -135,15 +134,11 @@ export default {
                     title: "错误处理",
                     subs: [
                         {
-                            index: "permission",
+                            index: "/permission",
                             title: "权限测试"
                         },
                         {
-                            index: "member",
-                            title: "成员管理"
-                        },
-                        {
-                            index: "404",
+                            index: "/404",
                             title: "404页面"
                         }
                     ]

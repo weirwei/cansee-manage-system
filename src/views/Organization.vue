@@ -22,7 +22,14 @@
       >
         <el-table-column prop="orgId" label="组织ID"></el-table-column>
         <el-table-column prop="orgName" label="组织名"></el-table-column>
-        <el-table-column prop="projNum" label="项目数量"></el-table-column>
+        <el-table-column label="成员数量">
+          <template #default="scope">
+            <el-button
+                type="text"
+                @click="handleGotoProj(scope.row)"
+            >{{scope.row.projNum}}</el-button>
+          </template>
+        </el-table-column>
         <el-table-column label="成员数量">
           <template #default="scope">
             <el-button
@@ -177,6 +184,11 @@ export default {
     // 跳转到用户管理页面
     handleGotoMember(row) {
       let path = "/" + row.orgId + "/member"
+      this.$router.push(path)
+    },
+    // 跳转到用户管理页面
+    handleGotoProj(row) {
+      let path = "/" + row.orgId + "/proj"
       this.$router.push(path)
     },
     // 创建组织操作

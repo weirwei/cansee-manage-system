@@ -78,10 +78,18 @@ const routes = [
                 path: "/:orgId/member",
                 name: "member",
                 meta: {
-                    title: '成员管理管理',
+                    title: '成员管理',
                 },
                 component: () => import (
                 "../views/MemberManage.vue")
+            }, {
+                path: "/:orgId/proj",
+                name: "project",
+                meta: {
+                    title: '项目管理',
+                },
+                component: () => import (
+                "../views/Project.vue")
             }, {
                 path: "/i18n",
                 name: "i18n",

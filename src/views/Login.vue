@@ -32,8 +32,7 @@
 </template>
 
 <script>
-import { login } from "@/api/login";
-import axios from "axios";
+import {login} from "@/api/login";
 
 export default {
   data() {
