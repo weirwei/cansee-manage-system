@@ -91,6 +91,14 @@ const routes = [
                 component: () => import (
                 "../views/Project.vue")
             }, {
+                path: "/:orgId/:projId/log/:type",
+                name: "log",
+                meta: {
+                    title: '日志管理',
+                },
+                component: () => import (
+                "../views/Log.vue")
+            }, {
                 path: "/i18n",
                 name: "i18n",
                 meta: {

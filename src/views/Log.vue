@@ -3,15 +3,25 @@
     <div class="crumbs">
       <el-breadcrumb separator="/">
         <el-breadcrumb-item>
-          <i class="el-icon-lx-cascades"></i> 项目管理
+          <i class="el-icon-lx-cascades"></i> 日志管理
         </el-breadcrumb-item>
       </el-breadcrumb>
     </div>
     <div class="container">
       <div class="handle-box">
-        <el-input v-model="search" placeholder="项目名或项目ID" class="handle-input mr10"></el-input>
-        <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
-        <el-button type="primary" icon="el-icon-lx-goods" @click="handleAdd">添加</el-button>
+        <el-date-picker
+            class="time-picker"
+            v-model="logTime"
+            type="datetimerange"
+            :shortcuts="shortcuts"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            align="right">
+        </el-date-picker>
+        <el-input v-model="searchReqId" placeholder="requestId" class="handle-input mr10"></el-input>
+        <el-button type="primary" icon="el-icon-search" @click="handleSearch(1)">搜索</el-button>
+        <el-button type="success" icon="el-icon-lx-delete" @click="handleSearch(0)">回收站</el-button>
       </div>
       <el-table
           :data="projList"
@@ -20,34 +30,29 @@
           ref="multipleTable"
           header-cell-class-name="table-header"
       >
-        <el-table-column prop="projId" label="项目ID"></el-table-column>
-        <el-table-column prop="projName" label="项目名"></el-table-column>
-        <el-table-column label="info" align="center">
+        <el-table-column prop="logId" label="日志ID"></el-table-column>
+        <el-table-column prop="reqId" label="请求ID"></el-table-column>
+        <el-table-column label="日志级别" align="center">
           <template #default="scope">
-            <el-tag type="info"
-                    @click="handleGotoInfo(scope.row)"
-            >{{ scope.row.logNum.info }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="warning" align="center">
-          <template #default="scope">
-            <el-tag type="warning"
-                    @click="handleGotoWarn(scope.row)"
-            >{{ scope.row.logNum.warning }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="error" align="center">
-          <template #default="scope">
-            <el-tag type="danger"
-                    @click="handleGotoError(scope.row)"
-            >{{ scope.row.logNum.error }}
-            </el-tag>
-          </template>
-        </el-table-column>
+            <el-tag
+                :type="
+                                        scope.row.logType === 10003
+                                            ? 'warning'
+                                            : scope.row.logType === 10002
+                                            ? 'success'
+                                            : scope.row.logType === 10001
+                                            ? 'info'
+                                            : ''
+                                    "
 
-        <el-table-column prop="createTime" label="创建时间"></el-table-column>
+            >{{ getLevel(scope.row) }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="proj.projName" label="项目名"></el-table-column>
+        <el-table-column prop="org.orgName" label="组织名"></el-table-column>
+        <el-table-column prop="logTime" label="产生时间"></el-table-column>
+        <el-table-column prop="logClass" label="所属类"></el-table-column>
         <el-table-column label="操作" width="180" align="center">
           <template #default="scope">
             <el-button
@@ -85,38 +90,51 @@
         ></el-pagination>
       </div>
     </div>
-
-    <!-- 新建项目弹出框 -->
-    <el-dialog title="新建项目" v-model="addVisible" width="30%">
-      <el-form ref="form" :model="projName" label-width="70px">
-        <el-form-item label="项目名">
-          <el-input v-model="projName"></el-input>
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <span class="dialog-footer">
-            <el-button @click="addVisible = false">取 消</el-button>
-            <el-button type="primary" @click="addProj">确 定</el-button>
-        </span>
-      </template>
-    </el-dialog>
   </div>
 </template>
 
 <script>
 
-import {addProjReq, delProjReq, getOrgProjReq} from "@/api/project";
+import {delLogReq, getLogReq} from "@/api/log";
 
 export default {
-  name: "project",
+  name: "log",
   data() {
     return {
       query: {
         orgId: "",
+        projId: "",
+        type: "",
         page: 1,
         size: 10,
       },
-      search: "",
+      shortcuts: [{
+        text: '最近一周',
+        value: (() => {
+          const end = new Date();
+          const start = new Date();
+          start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+          return [start, end]
+        })()
+      }, {
+        text: '最近一个月',
+        value: (() => {
+          const end = new Date();
+          const start = new Date();
+          start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+          return [start, end]
+        })()
+      }, {
+        text: '最近三个月',
+        value: (() => {
+          const end = new Date();
+          const start = new Date();
+          start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+          return [start, end]
+        })()
+      }],
+      logTime: [],
+      searchReqId: "",
       projList: [],
       addVisible: false,
       pageTotal: 0,
@@ -129,12 +147,11 @@ export default {
     this.getData()
   },
   methods: {
-    // 获取 easy-mock 的模拟数据
     getData() {
-      // console.log(this.$route.params)
-      // console.log(localStorage.getItem("ms_uid"))
       this.query.orgId = this.$route.params.orgId
-      getOrgProjReq(this.query).then(res => {
+      this.query.projId = this.$route.params.projId
+      this.query.type = this.$route.params.type
+      getLogReq(this.query).then(res => {
         console.log(res)
         if (res.status === "success") {
           this.projList = res.data.list
@@ -150,15 +167,29 @@ export default {
       })
     },
     // 触发搜索按钮
-    handleSearch() {
+    handleSearch(solved) {
       this.query.page = 1
+      this.query.orgId = this.$route.params.orgId
+      this.query.projId = this.$route.params.projId
+      this.query.type = this.$route.params.type
+      let start, end;
+      // 获取时间戳
+      if (this.logTime !== null && this.logTime.length === 2) {
+        start = new Date(this.logTime[0]).getTime()
+        end = new Date(this.logTime[1]).getTime()
+      }
       let query = {
         orgId: this.query.orgId,
+        projId: this.query.projId,
+        type: this.query.type,
         page: this.query.page,
         size: this.query.size,
-        search: this.search,
+        start: start,
+        end: end,
+        searchReqId: this.searchReqId,
+        solved: solved,
       }
-      getOrgProjReq(query).then(res => {
+      getLogReq(query).then(res => {
         console.log(res)
         if (res.status === "success") {
           this.projList = res.data.list
@@ -174,32 +205,18 @@ export default {
       })
 
     },
-    // 触发显示添加成员搜索框
-    handleAdd() {
-      this.addVisible = true
-    },
-    // 添加项目
-    addProj() {
-      console.log("projName: " + this.projName)
-      let param = {
-        orgId: this.$route.params.orgId,
-        projName: this.projName,
+    // 获取日志级别
+    getLevel(row) {
+      switch (row.logType) {
+        case 10001:
+          return "info"
+        case 10002:
+          return "warn"
+        case 10003:
+          return "error"
+        default:
+          return ""
       }
-      addProjReq(param).then(res => {
-        console.log(res)
-        if (res.status === "success") {
-          this.projList.push(res.data)
-          this.$message.success("添加成功")
-          this.addVisible = false
-          return true
-        } else if (res.status === "fail") {
-          this.$message.error(res.data.errorMsg)
-          if (res.data.errorCode === 100010 || res.data.errorCode === 10002) {
-            this.$router.push("/login")
-          }
-          return false
-        }
-      })
     },
     // 移除操作
     handleDelete(index, row) {
@@ -208,7 +225,7 @@ export default {
         orgId: this.$route.params.orgId,
         delUid: row.uid,
       }
-      delProjReq(param).then(res => {
+      delLogReq(param).then(res => {
         console.log(res)
         if (res.status === "success") {
           this.$message.success("移除成功")
@@ -227,18 +244,6 @@ export default {
     // 获得项目配置信息
     handleGetProjConf() {
 
-    },
-    handleGotoInfo(row) {
-      let path = "/" + this.query.orgId + "/" + row.projId + "/log/info"
-      this.$router.push(path)
-    },
-    handleGotoWarn(row) {
-      let path = "/" + this.query.orgId + "/" + row.projId + "/log/warn"
-      this.$router.push(path)
-    },
-    handleGotoError(row) {
-      let path = "/" + this.query.orgId + "/" + row.projId + "/log/warn"
-      this.$router.push(path)
     },
     // 分页导航
     handlePageChange(val) {
@@ -274,5 +279,10 @@ export default {
 
 .mr10 {
   margin-right: 10px;
+}
+
+.todo-item-del {
+  text-decoration: line-through;
+  color: #999;
 }
 </style>

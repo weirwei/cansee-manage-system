@@ -22,7 +22,7 @@
       >
         <el-table-column prop="orgId" label="组织ID"></el-table-column>
         <el-table-column prop="orgName" label="组织名"></el-table-column>
-        <el-table-column label="成员数量">
+        <el-table-column label="项目数量">
           <template #default="scope">
             <el-button
                 type="text"
