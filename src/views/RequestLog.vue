@@ -9,19 +9,8 @@
     </div>
     <div class="container">
       <div class="handle-box">
-        <el-date-picker
-            class="time-picker"
-            v-model="logTime"
-            type="datetimerange"
-            :shortcuts="shortcuts"
-            range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-            align="right">
-        </el-date-picker>
-        <el-input v-model="searchReqId" placeholder="requestId" class="handle-input mr10"></el-input>
-        <el-button type="primary" icon="el-icon-search" @click="handleSearch(0)">搜索</el-button>
-        <el-button type="success" icon="el-icon-lx-delete" @click="handleSearch(1)">回收站</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="getData(0)">未解决</el-button>
+        <el-button type="success" icon="el-icon-lx-delete" @click="getData(1)">已解决</el-button>
       </div>
       <el-table
           :data="projList"
@@ -31,15 +20,7 @@
           header-cell-class-name="table-header"
       >
 <!--        <el-table-column prop="logId" label="日志ID"></el-table-column>-->
-        <el-table-column label="请求ID">
-          <template #default="scope">
-            <el-label-wrap
-                class="blue"
-                type="text"
-                @click="handleGetRequest(scope.row)"
-            >{{scope.row.reqId}}</el-label-wrap>
-          </template>
-        </el-table-column>
+        <el-table-column prop="reqId" label="请求ID"></el-table-column>
         <el-table-column label="日志级别" align="center">
           <template #default="scope">
             <el-tag
@@ -129,43 +110,18 @@
 import {delLogReq, getLogReq, solveLogReq} from "@/api/log";
 
 export default {
-  name: "log",
+  name: "requestLog",
   data() {
     return {
       query: {
         orgId: "",
         projId: "",
+        searchReqId: "",
         type: "",
+        solved: 0,
         page: 1,
         size: 10,
       },
-      shortcuts: [{
-        text: '最近一周',
-        value: (() => {
-          const end = new Date();
-          const start = new Date();
-          start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-          return [start, end]
-        })()
-      }, {
-        text: '最近一个月',
-        value: (() => {
-          const end = new Date();
-          const start = new Date();
-          start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-          return [start, end]
-        })()
-      }, {
-        text: '最近三个月',
-        value: (() => {
-          const end = new Date();
-          const start = new Date();
-          start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-          return [start, end]
-        })()
-      }],
-      logTime: [],
-      searchReqId: "",
       projList: [],
       pageTotal: 0,
       projName: "",
@@ -174,13 +130,15 @@ export default {
     }
   },
   created() {
-    this.getData()
+    this.getData(0)
   },
   methods: {
-    getData() {
+    getData(solved) {
       this.query.orgId = this.$route.params.orgId
       this.query.projId = this.$route.params.projId
-      this.query.type = this.$route.params.type
+      this.query.searchReqId = this.$route.params.reqId
+      this.query.type = "all"
+      this.query.solved = solved
       getLogReq(this.query).then(res => {
         console.log(res)
         if (res.status === "success") {
@@ -195,45 +153,6 @@ export default {
           return false
         }
       })
-    },
-    // 触发搜索按钮
-    handleSearch(solved) {
-      this.query.page = 1
-      this.query.orgId = this.$route.params.orgId
-      this.query.projId = this.$route.params.projId
-      this.query.type = this.$route.params.type
-      let start, end;
-      // 获取时间戳
-      if (this.logTime !== null && this.logTime.length === 2) {
-        start = new Date(this.logTime[0]).getTime()
-        end = new Date(this.logTime[1]).getTime()
-      }
-      let query = {
-        orgId: this.query.orgId,
-        projId: this.query.projId,
-        type: this.query.type,
-        page: this.query.page,
-        size: this.query.size,
-        start: start,
-        end: end,
-        searchReqId: this.searchReqId,
-        solved: solved,
-      }
-      getLogReq(query).then(res => {
-        console.log(res)
-        if (res.status === "success") {
-          this.projList = res.data.list
-          this.pageTotal = res.data.pageTotal || 50
-          return true
-        } else if (res.status === "fail") {
-          this.$message.error(res.data.errorMsg)
-          if (res.data.errorCode === 100010 || res.data.errorCode === 10002) {
-            this.$router.push("/login")
-          }
-          return false
-        }
-      })
-
     },
     // 获取日志级别
     getLevel(row) {
@@ -327,11 +246,6 @@ export default {
           return false
         }
       })
-    },
-    // 跳转链路日志界面
-    handleGetRequest(row) {
-      let path = "/" + this.query.orgId + "/" + this.query.projId + "/log/all/" + row.reqId
-      this.$router.push(path)
     },
     // 分页导航
     handlePageChange(val) {

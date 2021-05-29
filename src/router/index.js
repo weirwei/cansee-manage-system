@@ -20,59 +20,14 @@ const routes = [
                 /* webpackChunkName: "dashboard" */
                 "../views/Dashboard.vue")
             }, {
-                path: "/table",
-                name: "basetable",
+                path: "/organization",
+                name: "organization",
                 meta: {
-                    title: '表格'
-                },
-                component: () => import (
-                /* webpackChunkName: "table" */
-                "../views/BaseTable.vue")
-            }, {
-                path: "/charts",
-                name: "basecharts",
-                meta: {
-                    title: '图表'
-                },
-                component: () => import (
-                /* webpackChunkName: "charts" */
-                "../views/BaseCharts.vue")
-            }, {
-                path: "/form",
-                name: "baseform",
-                meta: {
-                    title: '表单'
-                },
-                component: () => import (
-                /* webpackChunkName: "form" */
-                "../views/BaseForm.vue")
-            }, {
-                path: "/tabs",
-                name: "tabs",
-                meta: {
-                    title: 'tab标签'
-                },
-                component: () => import (
-                /* webpackChunkName: "tabs" */
-                "../views/Tabs.vue")
-            }, {
-                path: "/donate",
-                name: "donate",
-                meta: {
-                    title: '鼓励作者'
-                },
-                component: () => import (
-                /* webpackChunkName: "donate" */
-                "../views/Donate.vue")
-            }, {
-                path: "/permission",
-                name: "permission",
-                meta: {
-                    title: '权限管理',
+                    title: '组织管理',
                     // permission: true
                 },
                 component: () => import (
-                /* webpackChunkName: "permission" */
+                /* webpackChunkName: "organization" */
                 "../views/Organization.vue")
             }, {
                 path: "/:orgId/member",
@@ -81,7 +36,8 @@ const routes = [
                     title: '成员管理',
                 },
                 component: () => import (
-                "../views/MemberManage.vue")
+                    /* webpackChunkName: "member" */
+                    "../views/MemberManage.vue")
             }, {
                 path: "/:orgId/proj",
                 name: "project",
@@ -89,7 +45,8 @@ const routes = [
                     title: '项目管理',
                 },
                 component: () => import (
-                "../views/Project.vue")
+                    /* webpackChunkName: "project" */
+                    "../views/Project.vue")
             }, {
                 path: "/:orgId/:projId/log/:type",
                 name: "log",
@@ -97,34 +54,17 @@ const routes = [
                     title: '日志管理',
                 },
                 component: () => import (
-                "../views/Log.vue")
+                    /* webpackChunkName: "log" */
+                    "../views/Log.vue")
             }, {
-                path: "/i18n",
-                name: "i18n",
+                path: "/:orgId/:projId/log/all/:reqId",
+                name: "requestLog",
                 meta: {
-                    title: '国际化语言'
+                    title: '请求链路',
                 },
                 component: () => import (
-                /* webpackChunkName: "i18n" */
-                "../views/I18n.vue")
-            }, {
-                path: "/upload",
-                name: "upload",
-                meta: {
-                    title: '上传插件'
-                },
-                component: () => import (
-                /* webpackChunkName: "upload" */
-                "../views/Upload.vue")
-            }, {
-                path: "/icon",
-                name: "icon",
-                meta: {
-                    title: '自定义图标'
-                },
-                component: () => import (
-                /* webpackChunkName: "icon" */
-                "../views/Icon.vue")
+                    /* webpackChunkName: "requestLog" */
+                    "../views/RequestLog.vue")
             }, {
                 path: '/404',
                 name: '404',
@@ -133,14 +73,6 @@ const routes = [
                 },
                 component: () => import (/* webpackChunkName: "404" */
                 '../views/404.vue')
-            }, {
-                path: '/403',
-                name: '403',
-                meta: {
-                    title: '没有权限'
-                },
-                component: () => import (/* webpackChunkName: "403" */
-                '../views/403.vue')
             }
         ]
     }, {

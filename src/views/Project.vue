@@ -237,7 +237,7 @@ export default {
       this.$router.push(path)
     },
     handleGotoError(row) {
-      let path = "/" + this.query.orgId + "/" + row.projId + "/log/warn"
+      let path = "/" + this.query.orgId + "/" + row.projId + "/log/error"
       this.$router.push(path)
     },
     // 分页导航
