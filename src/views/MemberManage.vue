@@ -205,7 +205,6 @@ export default {
     },
     // 移除操作
     handleDelete(index, row) {
-      this.$message.success("移除成功")
       let param = {
         orgId: this.$route.params.orgId,
         delUid: row.uid,

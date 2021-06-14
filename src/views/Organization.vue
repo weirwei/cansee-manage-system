@@ -155,10 +155,6 @@ export default {
         type: "warning"
       })
           .then(() => {
-            if (row.role.orgId !== 10001) {
-              this.$message.error("权限不足")
-              return false
-            }
             let param = {
               orgId: row.orgId,
             }

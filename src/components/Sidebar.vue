@@ -61,7 +61,12 @@ export default {
                 {
                     icon: "el-icon-lx-warn",
                     index: "/organization",
-                    title: "项目管理",
+                    title: "组织管理",
+                },
+                {
+                    icon: "el-icon-plus",
+                    index: "/register",
+                    title: "注册",
                 }
             ]
         };

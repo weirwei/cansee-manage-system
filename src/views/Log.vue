@@ -30,7 +30,6 @@
           ref="multipleTable"
           header-cell-class-name="table-header"
       >
-<!--        <el-table-column prop="logId" label="日志ID"></el-table-column>-->
         <el-table-column label="请求ID">
           <template #default="scope">
             <el-label-wrap
@@ -58,7 +57,6 @@
           </template>
         </el-table-column>
         <el-table-column prop="proj.projName" label="项目名"></el-table-column>
-<!--        <el-table-column prop="org.orgName" label="组织名"></el-table-column>-->
         <el-table-column prop="logMsg" label="日志内容"></el-table-column>
         <el-table-column prop="logTime" label="产生时间"></el-table-column>
         <el-table-column prop="logClass" label="所属类"></el-table-column>

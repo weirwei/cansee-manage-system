@@ -20,6 +20,16 @@ const routes = [
                 /* webpackChunkName: "dashboard" */
                 "../views/Dashboard.vue")
             }, {
+                path: "/register",
+                name: "register",
+                meta: {
+                    title: '注册',
+                    permission: true
+                },
+                component: () => import (
+                /* webpackChunkName: "register" */
+                "../views/Register.vue")
+            }, {
                 path: "/organization",
                 name: "organization",
                 meta: {
@@ -73,6 +83,14 @@ const routes = [
                 },
                 component: () => import (/* webpackChunkName: "404" */
                 '../views/404.vue')
+            }, {
+                path: '/403',
+                name: '403',
+                meta: {
+                    title: '权限不足'
+                },
+                component: () => import (/* webpackChunkName: "403" */
+                '../views/403.vue')
             }
         ]
     }, {
@@ -94,12 +112,12 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
     document.title = `${to.meta.title} | vue-manage-system`;
-    const role = localStorage.getItem('ms_username');
-    if (!role && to.path !== '/login') {
+    const uid = localStorage.getItem('ms_uid');
+    if (!uid && to.path === '/register') {
         next('/login');
     } else if (to.meta.permission) {
         // 如果是管理员权限则可进入，这里只是简单的模拟管理员权限而已
-        role === '13136204665'
+        uid === 'ADMIN'
             ? next()
             : next('/403');
     } else {

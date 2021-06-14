@@ -35,9 +35,19 @@ const delProjReq = param => {
         },
     })
 }
+const getProjConfReq = param => {
+    return request({
+        url: server + '/' + param.orgId + '/proj/' + param.projId + "/conf",
+        method: 'get',
+        headers: {
+            'authorization': localStorage.getItem('authorization')
+        },
+    })
+}
 
 export {
     getOrgProjReq,
     addProjReq,
     delProjReq,
+    getProjConfReq,
 }

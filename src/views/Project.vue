@@ -54,7 +54,7 @@
                 type="text"
                 icon="el-icon-lx-text"
                 class="blue"
-                @click="handleGetProjConf"
+                @click="handleGetProjConf(scope.$index, scope.row)"
             >配置
             </el-button>
             <el-popconfirm
@@ -100,12 +100,18 @@
         </span>
       </template>
     </el-dialog>
+    <!-- 配置弹出框 -->
+    <el-dialog title="配置" v-model="jsonVisible" width="30%">
+      <p>{{json}}</p>
+    </el-dialog>
   </div>
+
+
 </template>
 
 <script>
 
-import {addProjReq, delProjReq, getOrgProjReq} from "@/api/project";
+import {addProjReq, delProjReq, getOrgProjReq, getProjConfReq} from "@/api/project";
 
 export default {
   name: "project",
@@ -121,6 +127,8 @@ export default {
       addVisible: false,
       pageTotal: 0,
       projName: "",
+      json: "",
+      jsonVisible: false,
       idx: -1,
       id: -1,
     }
@@ -203,10 +211,9 @@ export default {
     },
     // 移除操作
     handleDelete(index, row) {
-      this.$message.success("移除成功")
       let param = {
         orgId: this.$route.params.orgId,
-        delUid: row.uid,
+        delProjId: row.projId,
       }
       delProjReq(param).then(res => {
         console.log(res)
@@ -225,8 +232,25 @@ export default {
       })
     },
     // 获得项目配置信息
-    handleGetProjConf() {
-
+    handleGetProjConf(index, row) {
+      let param = {
+        orgId: this.$route.params.orgId,
+        projId: row.projId,
+      }
+      getProjConfReq(param).then(res => {
+        console.log(res)
+        if (res.status === "success") {
+          this.json = res.data
+          this.jsonVisible = true
+          return true
+        } else if (res.status === "fail") {
+          this.$message.error(res.data.errorMsg)
+          if (res.data.errorCode === 100010 || res.data.errorCode === 10002) {
+            this.$router.push("/login")
+          }
+          return false
+        }
+      })
     },
     handleGotoInfo(row) {
       let path = "/" + this.query.orgId + "/" + row.projId + "/log/info"

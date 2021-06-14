@@ -9,3 +9,4 @@ export const login = param => {
         data: qs.stringify(param)
     })
 }
+

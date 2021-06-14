@@ -1,44 +1,58 @@
 <template>
-  <div class="login-wrap">
-    <div class="ms-login">
-      <div class="ms-title">后台管理系统</div>
-      <el-form :model="param" :rules="rules" ref="login" label-width="0px" class="ms-content">
-        <el-form-item prop="telephone">
-          <el-input v-model="param.telephone" placeholder="telephone">
-            <template #prepend>
-              <el-button icon="el-icon-mobile-phone"></el-button>
-            </template>
-          </el-input>
-        </el-form-item>
-        <el-form-item prop="password">
-          <el-input
-              type="password"
-              placeholder="password"
-              v-model="param.passwd"
-              @keyup.enter="submitForm()"
-          >
-            <template #prepend>
-              <el-button icon="el-icon-lock"></el-button>
-            </template>
-          </el-input>
-        </el-form-item>
-        <div class="login-btn">
-          <el-button type="primary" @click="submitForm()">登录</el-button>
-        </div>
-        <p class="login-tips">Tips : 填注册手机号和密码。</p>
-      </el-form>
+  <div>
+    <div class="crumbs">
+      <el-breadcrumb separator="/">
+        <el-breadcrumb-item>
+          <i class="el-icon-lx-cascades"></i> 注册
+        </el-breadcrumb-item>
+      </el-breadcrumb>
     </div>
+    <el-form :model="param" :rules="rules" ref="login" label-width="0px" class="ms-content">
+      <el-form-item prop="telephone">
+        <el-input v-model="param.telephone" placeholder="telephone">
+          <template #prepend>
+            <el-button icon="el-icon-mobile-phone"></el-button>
+          </template>
+        </el-input>
+      </el-form-item>
+      <el-form-item prop="nickname">
+        <el-input v-model="param.nickname" placeholder="nickname">
+          <template #prepend>
+            <el-button icon="el-icon-user"></el-button>
+          </template>
+        </el-input>
+      </el-form-item>
+      <el-form-item prop="password">
+        <el-input
+            type="password"
+            placeholder="password"
+            v-model="param.passwd"
+            @keyup.enter="submitForm()"
+        >
+          <template #prepend>
+            <el-button icon="el-icon-lock"></el-button>
+          </template>
+        </el-input>
+      </el-form-item>
+      <div class="login-btn">
+        <el-button type="primary" @click="submitForm()">注册</el-button>
+      </div>
+      <p class="login-tips">Tips : 用户名和密码随便填。</p>
+    </el-form>
+
   </div>
 </template>
 
 <script>
-import {login} from "@/api/login";
+import {register} from "@/api/index";
 
 export default {
+  name: "register",
   data() {
     return {
       param: {
         telephone: "",
+        nickname: "",
         passwd: ""
       },
       rules: {
@@ -61,25 +75,21 @@ export default {
     }
   },
   created() {
-    this.$store.commit("clearTags")
   },
   methods: {
     submitForm() {
       this.$refs.login.validate(valid => {
         if (valid) {
           console.log(this.param)
-          login(this.param).then((res) => {
+          register(this.param).then((res) => {
             console.log(res)
             if (res.status === 'fail') {
               this.$message.error(res.data.errorMsg)
-              this.$message.error("请输入正确的账号和密码")
+              this.$message.error("注册失败")
               return false
             } else if (res.status === 'success') {
-              this.$message.success("登录成功")
-              localStorage.setItem("ms_username", res.data.nick)
-              localStorage.setItem("ms_uid", res.data.uid)
-              localStorage.setItem("authorization", res.data.token)
-              this.$router.push("/")
+              this.$message.success("注册成功")
+              location.reload()
               return true
             }
           })
@@ -89,6 +99,7 @@ export default {
         }
       })
     }
+
   }
 }
 </script>
@@ -142,3 +153,4 @@ export default {
   color: #fff;
 }
 </style>
+

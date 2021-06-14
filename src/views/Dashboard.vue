@@ -10,6 +10,10 @@
             </div>
           </div>
           <div class="user-info-list">
+            用 户 I D ：
+            <span>{{ user.uid }}</span>
+          </div>
+          <div class="user-info-list">
             注册时间：
             <span>{{ user.createTime }}</span>
           </div>
@@ -147,20 +151,20 @@ export default {
       lineChat: {
         type: "line",
         title: {
-          text: "最近几个月各品类销售趋势图"
+          text: "近几天日志趋势图"
         },
-        labels: ["6月", "7月", "8月", "9月", "10月"],
+        labels: ["11日", "12日", "13日", "14日", "15日"],
         datasets: [
           {
-            label: "家电",
+            label: "INFO",
             data: [234, 278, 270, 190, 230]
           },
           {
-            label: "百货",
+            label: "WARN",
             data: [164, 178, 150, 135, 160]
           },
           {
-            label: "食品",
+            label: "ERROR",
             data: [74, 118, 200, 235, 90]
           }
         ]
